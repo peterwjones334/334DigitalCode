@@ -3,6 +3,10 @@ import os
 import logging
 from pydub import AudioSegment
 from moviepy.editor import VideoFileClip, AudioFileClip, TextClip, concatenate_videoclips
+from moviepy.config import change_settings
+
+# Specify the path to ImageMagick
+change_settings({"IMAGEMAGICK_BINARY": r"C:\Program Files\ImageMagick-7.1.1-Q16-HDRI\magick.exe"}) #!!! path will vary
 
 def images_to_video(input_dir, temp_video_file, frame_rate):
     try:
@@ -79,6 +83,10 @@ def add_audio_to_video(video_file, audio_file, output_file, title, author, title
         title_clip = create_text_clip(title, title_duration, (width, height), fontsize, color)
         credits_clip = create_text_clip(f"Author: {author}\n© {author}", credits_duration, (width, height), fontsize, color)
 
+        if title_clip is None or credits_clip is None:
+            logging.error("Failed to create title or credits clip.")
+            return
+
         final_video = concatenate_videoclips([title_clip, video.set_audio(audio), credits_clip])
         final_video.write_videofile(output_file, codec='libx264', audio_codec='aac')
         logging.info(f"Final video with audio saved as {output_file}")
@@ -91,9 +99,9 @@ def add_audio_to_video(video_file, audio_file, output_file, title, author, title
 
 if __name__ == "__main__":
     # Define variables for inputs and outputs
-    image_directory = "path/to/images"
-    audio_directory = "path/to/audios"
-    output_video_file = "path/to/output/video.mp4"
+    image_directory = "/images"
+    audio_directory = "/audio"
+    output_video_file = "video.mp4"
     title = "My Video Title"
     author = "Author Name"
     title_duration = 5  # Duration of the title sequence in seconds

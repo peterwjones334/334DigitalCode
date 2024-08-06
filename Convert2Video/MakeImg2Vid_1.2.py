@@ -1,23 +1,19 @@
 import cv2
 import os
-import argparse
 import logging
 from pydub import AudioSegment
 from moviepy.editor import VideoFileClip, AudioFileClip, TextClip, concatenate_videoclips
 
 def images_to_video(input_dir, temp_video_file, frame_rate):
     try:
-        # Configure logging
         logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-        # Get all image files in the input directory
         image_files = [f for f in sorted(os.listdir(input_dir)) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
 
         if not image_files:
             logging.error("No images found in the directory.")
             return
 
-        # Read the first image to get the dimensions
         first_image_path = os.path.join(input_dir, image_files[0])
         frame = cv2.imread(first_image_path)
         if frame is None:
@@ -27,7 +23,6 @@ def images_to_video(input_dir, temp_video_file, frame_rate):
         height, width, layers = frame.shape
         size = (width, height)
 
-        # Initialize the video writer
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         video = cv2.VideoWriter(temp_video_file, fourcc, frame_rate, size)
 
@@ -88,7 +83,6 @@ def add_audio_to_video(video_file, audio_file, output_file, title, author, title
         final_video.write_videofile(output_file, codec='libx264', audio_codec='aac')
         logging.info(f"Final video with audio saved as {output_file}")
 
-        # Clean up temporary files
         os.remove(video_file)
         os.remove(audio_file)
 
@@ -96,33 +90,32 @@ def add_audio_to_video(video_file, audio_file, output_file, title, author, title
         logging.error(f"Error in add_audio_to_video: {e}")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Convert a sequence of images into a video, add audio, title, and credits.")
-    parser.add_argument("image_directory", help="Directory containing the images")
-    parser.add_argument("audio_directory", help="Directory containing the MP3 files")
-    parser.add_argument("output_video_file", help="Output video file path")
-    parser.add_argument("title", help="Title text for the title sequence")
-    parser.add_argument("author", help="Author text for the credits sequence")
-    parser.add_argument("--title_duration", type=int, default=5, help="Duration of the title sequence in seconds")
-    parser.add_argument("--credits_duration", type=int, default=5, help="Duration of the credits sequence in seconds")
-    parser.add_argument("--fontsize", type=int, default=70, help="Font size for the title and credits text")
-    parser.add_argument("--color", default='white', help="Font color for the title and credits text")
-
-    args = parser.parse_args()
+    # Define variables for inputs and outputs
+    image_directory = "path/to/images"
+    audio_directory = "path/to/audios"
+    output_video_file = "path/to/output/video.mp4"
+    title = "My Video Title"
+    author = "Author Name"
+    title_duration = 5  # Duration of the title sequence in seconds
+    credits_duration = 5  # Duration of the credits sequence in seconds
+    fontsize = 70  # Font size for the title and credits text
+    color = 'white'  # Font color for the title and credits text
 
     temp_video_path = "temp_video.mp4"
     combined_audio_path = "combined_audio.mp3"
 
-    # Collate audio tracks
-    audio_duration = collate_audio_tracks(args.audio_directory, combined_audio_path)
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-    # Get all image files in the input directory
-    image_files = [f for f in sorted(os.listdir(args.image_directory)) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
+    audio_duration = collate_audio_tracks(audio_directory, combined_audio_path)
+
+    image_files = [f for f in sorted(os.listdir(image_directory)) if f.lower().endswith(('.png', '.jpg', '.jpeg'))]
 
     if image_files and audio_duration > 0:
         frame_rate = len(image_files) / audio_duration
         logging.info(f"Calculated frame rate: {frame_rate}")
 
-        images_to_video(args.image_directory, temp_video_path, frame_rate)
-        add_audio_to_video(temp_video_path, combined_audio_path, args.output_video_file, args.title, args.author, args.title_duration, args.credits_duration, args.fontsize, args.color)
+        images_to_video(image_directory, temp_video_path, frame_rate)
+        add_audio_to_video(temp_video_path, combined_audio_path, output_video_file, title, author, title_duration, credits_duration, fontsize, color)
     else:
         logging.error("No images found or audio duration is zero.")
+

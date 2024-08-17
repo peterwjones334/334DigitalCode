@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Git Command UI</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Git Command UI</h1>
+        <div class="form-group">
+            <label for="project-directory">Select Project Directory:</label>
+            <input type="file" id="project-directory" webkitdirectory directory multiple>
+        </div>
+        <div class="form-group">
+            <label for="git-command">Select Git Command:</label>
+            <select id="git-command">
+                <option value="status">git status</option>
+                <option value="add">git add .</option>
+                <option value="commit">git commit -m</option>
+                <option value="push">git push</option>
+            </select>
+        </div>
+        <div class="form-group" id="commit-message-group">
+            <label for="commit-message">Commit Message:</label>
+            <input type="text" id="commit-message" placeholder="Enter commit message">
+        </div>
+        <button id="execute-command">Execute Command</button>
+        <pre id="output"></pre>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
